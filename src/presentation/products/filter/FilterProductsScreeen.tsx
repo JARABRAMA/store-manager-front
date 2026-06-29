@@ -1,29 +1,48 @@
 import type { Product } from "../../../domain/model/Product";
-import { ImageWithPlaceholder } from "../../shared/ImageWithPlaceholder";
-import { TopBar } from "../../shared/TopBar";
+import { LoadingSpinner } from "../../shared/components/LoadingSpinner.tsx";
+import { ImageWithPlaceholder } from "../../shared/components/ImageWithPlaceholder.tsx";
+import { TopBar } from "../../shared/components/TopBar.tsx";
 import { FilterProductsForm } from "./FilterProductForm";
 import { useFilterProduct, type FilterProductData } from "./useFilterProduct";
 
 export function FilterProductsScreen() {
-  const { categories, loading, error, products }: FilterProductData =
-    useFilterProduct();
-  if (loading) {
-    return <p> Cargando... </p>;
-  }
+  const {
+    categories,
+    loading,
+    error,
+    products,
+    category,
+    onUpdateCategory,
+    onUpdateSearch,
+    search,
+  }: FilterProductData = useFilterProduct();
 
   return (
     <div className="flex flex-col flex-1 gap-2 bg-gray-900 text-gray-100  min-h-0">
       <TopBar title="Inventario" />
       <main className="flex flex-col flex-1 gap-2 min-h-0">
-        <FilterProductsForm categories={categories} />
+        <FilterProductsForm
+          category={category}
+          setCategory={onUpdateCategory}
+          search={search}
+          setSearch={onUpdateSearch}
+          categories={categories}
+        />
+        {loading && (
+          <div className="flex flex-1 items-center justify-center">
+            <LoadingSpinner />
+          </div>
+        )}
         {error && <p>{error}</p>}
-        <section className="flex flex-1 flex-col overflow-y-auto gap-2 px-2 min-h-0">
-          {products.map((p) => (
-            <ProductCard key={p.id} {...p} />
-          ))}
+        {!loading && !error && (
+          <section className="flex flex-1 flex-col overflow-y-auto gap-2 px-2 min-h-0">
+            {products.map((p) => (
+              <ProductCard key={p.id} {...p} />
+            ))}
 
-          <div className="py-8"></div>
-        </section>
+            <div className="py-8"></div>
+          </section>
+        )}
       </main>
     </div>
   );

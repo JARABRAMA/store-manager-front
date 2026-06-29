@@ -1,7 +1,7 @@
 import { Route, Routes } from "react-router";
 import "./App.css";
 import { FilterProductsScreen } from "./products/filter/FilterProductsScreeen";
-import { NavigationBar } from "./shared/NavigationBar";
+import { NavigationBar } from "./shared/components/NavigationBar";
 
 function App() {
   return (
