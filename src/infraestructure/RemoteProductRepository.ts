@@ -5,6 +5,7 @@ import type { ErrorResponse } from "./dto/ErrorResponse";
 import type { PageResponse } from "./dto/PageResponse";
 import type { ProductResponse } from "./dto/ProductResponse";
 import { ProductResponseMapper } from "./mapper/ProductResponseMapper";
+import { ConnectionFailedException } from "../domain/exceptions/ConnectionFailedException";
 
 export class RemoteProductRepository implements ProductRepositoryPort {
   private SERVICE_URL = import.meta.env.VITE_SERVICE_URL;
@@ -15,26 +16,35 @@ export class RemoteProductRepository implements ProductRepositoryPort {
     page: number,
   ): Promise<Page<Product>> {
     const params = this.getFilterProductsURLParams(search, category, page);
-    const res = await fetch(
-      `${this.SERVICE_URL}/api/products?${params.toString()}`,
-    );
-    if (!res.ok) {
-      const data = (await res.json()) as ErrorResponse;
-      throw new Error(`Http error: ${data.status} - ${data.message} `);
-    }
-    const pageResponse = (await res.json()) as PageResponse<ProductResponse>;
+    try {
+      const res = await fetch(
+        `${this.SERVICE_URL}/api/products?${params.toString()}`,
+      );
+      if (!res.ok) {
+        const data = (await res.json()) as ErrorResponse;
+        throw new Error(`Http error: ${data.status} - ${data.message} `);
+      }
+      const pageResponse = (await res.json()) as PageResponse<ProductResponse>;
 
-    return {
-      content: pageResponse.content.map((p) =>
-        ProductResponseMapper.toDomain(p),
-      ),
-      page: pageResponse.page,
-      size: pageResponse.size,
-      totalElements: pageResponse.totalElements,
-      totalPages: pageResponse.totalPages,
-      first: pageResponse.first,
-      last: pageResponse.last,
-    };
+      return {
+        content: pageResponse.content.map((p) =>
+          ProductResponseMapper.toDomain(p),
+        ),
+        page: pageResponse.page,
+        size: pageResponse.size,
+        totalElements: pageResponse.totalElements,
+        totalPages: pageResponse.totalPages,
+        first: pageResponse.first,
+        last: pageResponse.last,
+      };
+    } catch (e: unknown) {
+      if (e instanceof Error) {
+        console.log(e.message);
+      }
+      throw new ConnectionFailedException(
+        "Error de conexion intenta mas tarde",
+      );
+    }
   }
 
   private getFilterProductsURLParams(

@@ -4,6 +4,7 @@ import { ImageWithPlaceholder } from "../../shared/components/ImageWithPlacehold
 import { TopBar } from "../../shared/components/TopBar.tsx";
 import { FilterProductsForm } from "./FilterProductForm";
 import { useFilterProduct, type FilterProductData } from "./useFilterProduct";
+import { ErrorMessage } from "../../shared/components/ErrorMessage.tsx";
 
 export function FilterProductsScreen() {
   const {
@@ -33,7 +34,7 @@ export function FilterProductsScreen() {
             <LoadingSpinner />
           </div>
         )}
-        {error && <p>{error}</p>}
+        {error && <ErrorMessage message={error} />}
         {!loading && !error && (
           <section className="flex flex-1 flex-col overflow-y-auto gap-2 px-2 min-h-0">
             {products.map((p) => (
