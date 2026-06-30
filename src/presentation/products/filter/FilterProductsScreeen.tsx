@@ -71,7 +71,7 @@ export function ProductCard(params: Product) {
       <ImageWithPlaceholder
         src={imageUrl ?? ""}
         alt={`image of ${name}`}
-        className="row-span-3 size-24"
+        className="row-span-3 size-24 rounded-lg"
       />
       <span className="col-span-2 font-bold">{name}</span>
       <span className="col-span-2 text-sm">{description}</span>
