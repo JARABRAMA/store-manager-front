@@ -5,6 +5,7 @@ import { TopBar } from "../../shared/components/TopBar.tsx";
 import { FilterProductsForm } from "./FilterProductForm";
 import { useFilterProduct, type FilterProductData } from "./useFilterProduct";
 import { ErrorMessage } from "../../shared/components/ErrorMessage.tsx";
+import { Pagination } from "../../shared/components/Pagination.tsx";
 
 export function FilterProductsScreen() {
   const {
@@ -16,6 +17,8 @@ export function FilterProductsScreen() {
     onUpdateCategory,
     onUpdateSearch,
     search,
+    onUpdatePaginationData,
+    paginationData,
   }: FilterProductData = useFilterProduct();
 
   return (
@@ -36,13 +39,25 @@ export function FilterProductsScreen() {
         )}
         {error && <ErrorMessage message={error} />}
         {!loading && !error && (
-          <section className="flex flex-1 flex-col overflow-y-auto gap-2 px-2 min-h-0">
-            {products.map((p) => (
-              <ProductCard key={p.id} {...p} />
-            ))}
-
-            <div className="py-8"></div>
-          </section>
+          <div className="grid grid-rows-[1fr_auto] overflow-y-auto h-full gap-4 pb-4">
+            <section className="flex flex-col gap-2 px-2">
+              {products.map((p) => (
+                <ProductCard key={p.id} {...p} />
+              ))}
+            </section>
+            <Pagination
+              currentPage={paginationData.currentPage}
+              isFirst={paginationData.isFirst}
+              isLast={paginationData.isLast}
+              totalPages={paginationData.totalPages}
+              onUpdatePage={(page: number) =>
+                onUpdatePaginationData({
+                  ...paginationData,
+                  currentPage: page,
+                })
+              }
+            />
+          </div>
         )}
       </main>
     </div>

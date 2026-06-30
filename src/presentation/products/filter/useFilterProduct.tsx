@@ -3,6 +3,10 @@ import { filterProductsUseCase, findAllCategoriesUseCase } from "../../../di";
 import type { Product } from "../../../domain/model/Product";
 import { useSearchParams } from "react-router";
 import { useDebounceValue } from "../../shared/hooks/useDebounceValue";
+import {
+  usePagination,
+  type PaginationUIData,
+} from "../../shared/hooks/usePagination";
 
 export type FilterProductData = {
   categories: string[];
@@ -13,6 +17,8 @@ export type FilterProductData = {
   onUpdateSearch: (value: string) => void;
   category: string;
   onUpdateCategory: (value: string) => void;
+  paginationData: PaginationUIData;
+  onUpdatePaginationData: (data: PaginationUIData) => void;
 };
 
 export function useFilterProduct(): FilterProductData {
@@ -24,8 +30,9 @@ export function useFilterProduct(): FilterProductData {
   const [error, setError] = useState<string | null>(null);
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState<string>("");
-  const [page, setPage] = useState(0);
   const debouncedSearch = useDebounceValue(search, 500);
+  const { paginationData, onUpdatePaginationData } = usePagination();
+  const { currentPage: page } = paginationData;
 
   // load categories
   useEffect(() => {
@@ -55,6 +62,12 @@ export function useFilterProduct(): FilterProductData {
           search: debouncedSearch,
         });
         setProducts(products.content);
+        onUpdatePaginationData({
+          currentPage: products.page,
+          totalPages: products.totalPages,
+          isFirst: products.first,
+          isLast: products.last,
+        });
       } catch (e: unknown) {
         if (e instanceof Error) {
           setError(e.message);
@@ -64,7 +77,7 @@ export function useFilterProduct(): FilterProductData {
       }
     };
     loadProducts();
-  }, [category, page, debouncedSearch]);
+  }, [category, debouncedSearch, page]);
   // update url search params
   useEffect(() => {
     const params = new URLSearchParams();
@@ -83,6 +96,7 @@ export function useFilterProduct(): FilterProductData {
 
     setSearchParams(params);
   }, [category, page, search, setSearchParams]);
+  // if the category filter updates, currentPage should be set to cero
 
   return {
     categories,
@@ -92,10 +106,14 @@ export function useFilterProduct(): FilterProductData {
     search,
     onUpdateSearch: (value: string) => {
       setSearch(value);
+      onUpdatePaginationData({ ...paginationData, currentPage: 0 });
     },
     category,
     onUpdateCategory: (value: string) => {
       setCategory(value);
+      onUpdatePaginationData({ ...paginationData, currentPage: 0 });
     },
+    paginationData,
+    onUpdatePaginationData,
   };
 }
