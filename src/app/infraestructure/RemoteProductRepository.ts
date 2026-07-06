@@ -32,9 +32,7 @@ export class RemoteProductRepository implements ProductRepositoryPort {
         `${this.serviceUrl}/api/products?${params.toString()}`,
       );
     } catch (e: unknown) {
-      if (e instanceof Error) {
-        console.log(e.message);
-      }
+      console.error("Repository Error: ", e);
       throw new ConnectionFailedException();
     }
     if (!res.ok) {
@@ -80,11 +78,8 @@ export class RemoteProductRepository implements ProductRepositoryPort {
     try {
       res = await this.fetchFn(`${this.serviceUrl}/api/products/categories`);
     } catch (e: unknown) {
-      if (e instanceof Error) {
-        console.log(e);
-        throw new ConnectionFailedException();
-      }
-      return [];
+      console.log("Repository Error: ", e);
+      throw new ConnectionFailedException();
     }
     if (!res.ok) {
       const data = (await res.json()) as ErrorResponse;
