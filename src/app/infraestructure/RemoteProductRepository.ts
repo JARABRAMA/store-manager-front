@@ -9,7 +9,11 @@ import { ConnectionFailedException } from "../domain/exceptions/ConnectionFailed
 import { ServerErrorException } from "../domain/exceptions/ServerErrorException";
 
 export class RemoteProductRepository implements ProductRepositoryPort {
-  private SERVICE_URL = import.meta.env.VITE_SERVICE_URL;
+  private readonly serviceUrl: string;
+
+  constructor(serviceUrl: string = import.meta.env.VITE_SERVICE_URL) {
+    this.serviceUrl = serviceUrl;
+  }
 
   async findAll(
     search: string,
@@ -19,9 +23,7 @@ export class RemoteProductRepository implements ProductRepositoryPort {
     const params = this.getFilterProductsURLParams(search, category, page);
     let res: Response;
     try {
-      res = await fetch(
-        `${this.SERVICE_URL}/api/products?${params.toString()}`,
-      );
+      res = await fetch(`${this.serviceUrl}/api/products?${params.toString()}`);
     } catch (e: unknown) {
       if (e instanceof Error) {
         console.log(e.message);
@@ -69,7 +71,7 @@ export class RemoteProductRepository implements ProductRepositoryPort {
   async findAllCategories(): Promise<string[]> {
     let res: Response;
     try {
-      res = await fetch(`${this.SERVICE_URL}/api/products/categories`);
+      res = await fetch(`${this.serviceUrl}/api/products/categories`);
     } catch (e: unknown) {
       if (e instanceof Error) {
         console.log(e);
