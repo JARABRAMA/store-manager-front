@@ -17,39 +17,37 @@ export class RemoteProductRepository implements ProductRepositoryPort {
     page: number,
   ): Promise<Page<Product>> {
     const params = this.getFilterProductsURLParams(search, category, page);
+    let res: Response;
     try {
-      const res = await fetch(
+      res = await fetch(
         `${this.SERVICE_URL}/api/products?${params.toString()}`,
       );
-      if (!res.ok) {
-        const data = (await res.json()) as ErrorResponse;
-        throw new ServerErrorException(
-          data.status,
-          `Http error: ${data.status} - ${data.message}`,
-        );
-      }
-      const pageResponse = (await res.json()) as PageResponse<ProductResponse>;
-
-      return {
-        content: pageResponse.content.map((p) =>
-          ProductResponseMapper.toDomain(p),
-        ),
-        page: pageResponse.page,
-        size: pageResponse.size,
-        totalElements: pageResponse.totalElements,
-        totalPages: pageResponse.totalPages,
-        first: pageResponse.first,
-        last: pageResponse.last,
-      };
     } catch (e: unknown) {
-      if (e instanceof ServerErrorException) {
-        throw e;
-      }
       if (e instanceof Error) {
         console.log(e.message);
       }
       throw new ConnectionFailedException();
     }
+    if (!res.ok) {
+      const data = (await res.json()) as ErrorResponse;
+      throw new ServerErrorException(
+        data.status,
+        `Http error: ${data.status} - ${data.message}`,
+      );
+    }
+    const pageResponse = (await res.json()) as PageResponse<ProductResponse>;
+
+    return {
+      content: pageResponse.content.map((p) =>
+        ProductResponseMapper.toDomain(p),
+      ),
+      page: pageResponse.page,
+      size: pageResponse.size,
+      totalElements: pageResponse.totalElements,
+      totalPages: pageResponse.totalPages,
+      first: pageResponse.first,
+      last: pageResponse.last,
+    };
   }
 
   private getFilterProductsURLParams(
@@ -69,27 +67,24 @@ export class RemoteProductRepository implements ProductRepositoryPort {
   }
 
   async findAllCategories(): Promise<string[]> {
+    let res: Response;
     try {
-      const res = await fetch(`${this.SERVICE_URL}/api/products/categories`);
-
-      if (!res.ok) {
-        const data = (await res.json()) as ErrorResponse;
-        throw new ServerErrorException(
-          data.status,
-          `Http error: ${data.status} - ${data.message}`,
-        );
-      }
-      return (await res.json()) as string[];
+      res = await fetch(`${this.SERVICE_URL}/api/products/categories`);
     } catch (e: unknown) {
-      if (e instanceof ServerErrorException) {
-        throw e;
-      }
       if (e instanceof Error) {
         console.log(e);
         throw new ConnectionFailedException();
       }
       return [];
     }
+    if (!res.ok) {
+      const data = (await res.json()) as ErrorResponse;
+      throw new ServerErrorException(
+        data.status,
+        `Http error: ${data.status} - ${data.message}`,
+      );
+    }
+    return (await res.json()) as string[];
   }
 
   async save(product: Product): Promise<void> {
