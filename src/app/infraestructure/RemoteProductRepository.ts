@@ -6,6 +6,7 @@ import type { PageResponse } from "./dto/PageResponse";
 import type { ProductResponse } from "./dto/ProductResponse";
 import { ProductResponseMapper } from "./mapper/ProductResponseMapper";
 import { ConnectionFailedException } from "../domain/exceptions/ConnectionFailedException";
+import { ServerErrorException } from "../domain/exceptions/ServerErrorException";
 
 export class RemoteProductRepository implements ProductRepositoryPort {
   private SERVICE_URL = import.meta.env.VITE_SERVICE_URL;
@@ -22,7 +23,10 @@ export class RemoteProductRepository implements ProductRepositoryPort {
       );
       if (!res.ok) {
         const data = (await res.json()) as ErrorResponse;
-        throw new Error(`Http error: ${data.status} - ${data.message} `);
+        throw new ServerErrorException(
+          data.status,
+          `Http error: ${data.status} - ${data.message}`,
+        );
       }
       const pageResponse = (await res.json()) as PageResponse<ProductResponse>;
 
@@ -38,12 +42,13 @@ export class RemoteProductRepository implements ProductRepositoryPort {
         last: pageResponse.last,
       };
     } catch (e: unknown) {
+      if (e instanceof ServerErrorException) {
+        throw e;
+      }
       if (e instanceof Error) {
         console.log(e.message);
       }
-      throw new ConnectionFailedException(
-        "Error de conexion intenta mas tarde",
-      );
+      throw new ConnectionFailedException();
     }
   }
 
@@ -64,13 +69,27 @@ export class RemoteProductRepository implements ProductRepositoryPort {
   }
 
   async findAllCategories(): Promise<string[]> {
-    const res = await fetch(`${this.SERVICE_URL}/api/products/categories`);
+    try {
+      const res = await fetch(`${this.SERVICE_URL}/api/products/categories`);
 
-    if (!res.ok) {
-      const data = (await res.json()) as ErrorResponse;
-      throw new Error(`Http error: ${data.status} - ${data.message}`);
+      if (!res.ok) {
+        const data = (await res.json()) as ErrorResponse;
+        throw new ServerErrorException(
+          data.status,
+          `Http error: ${data.status} - ${data.message}`,
+        );
+      }
+      return (await res.json()) as string[];
+    } catch (e: unknown) {
+      if (e instanceof ServerErrorException) {
+        throw e;
+      }
+      if (e instanceof Error) {
+        console.log(e);
+        throw new ConnectionFailedException();
+      }
+      return [];
     }
-    return (await res.json()) as string[];
   }
 
   async save(product: Product): Promise<void> {
