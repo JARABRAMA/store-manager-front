@@ -7,6 +7,7 @@ import type { ProductResponse } from "./dto/ProductResponse";
 import { ProductResponseMapper } from "./mapper/ProductResponseMapper";
 import { ConnectionFailedException } from "../domain/exceptions/ConnectionFailedException";
 import { ServerErrorException } from "../domain/exceptions/ServerErrorException";
+import { BadRequestException } from "../domain/exceptions/BadRequestException";
 
 export class RemoteProductRepository implements ProductRepositoryPort {
   private readonly serviceUrl: string;
@@ -32,28 +33,33 @@ export class RemoteProductRepository implements ProductRepositoryPort {
         `${this.serviceUrl}/api/products?${params.toString()}`,
       );
     } catch (e: unknown) {
-      console.error("Repository Error: ", e);
+      console.log("Repository Error: ", e);
       throw new ConnectionFailedException();
     }
-    if (!res.ok) {
-      const data = (await res.json()) as ErrorResponse;
-      throw new ServerErrorException(
-        data.status,
-        `Http error: ${data.status} - ${data.message}`,
-      );
-    }
-    const pageResponse = (await res.json()) as PageResponse<ProductResponse>;
 
+    if (!res.ok) {
+      const error: ErrorResponse = await res.json();
+      if (res.status >= 400 && res.status < 500) {
+        throw new BadRequestException(error.message);
+      }
+      throw new ServerErrorException(error.message);
+    }
+
+    const pageResponse: PageResponse<ProductResponse> = await res.json();
+    return this.mapPageResponseToDomainPage(pageResponse);
+  }
+
+  private mapPageResponseToDomainPage(
+    page: PageResponse<ProductResponse>,
+  ): Page<Product> {
     return {
-      content: pageResponse.content.map((p) =>
-        ProductResponseMapper.toDomain(p),
-      ),
-      page: pageResponse.page,
-      size: pageResponse.size,
-      totalElements: pageResponse.totalElements,
-      totalPages: pageResponse.totalPages,
-      first: pageResponse.first,
-      last: pageResponse.last,
+      content: page.content.map((p) => ProductResponseMapper.toDomain(p)),
+      page: page.page,
+      size: page.size,
+      totalElements: page.totalElements,
+      totalPages: page.totalPages,
+      first: page.first,
+      last: page.last,
     };
   }
 
@@ -83,10 +89,7 @@ export class RemoteProductRepository implements ProductRepositoryPort {
     }
     if (!res.ok) {
       const data = (await res.json()) as ErrorResponse;
-      throw new ServerErrorException(
-        data.status,
-        `Http error: ${data.status} - ${data.message}`,
-      );
+      throw new ServerErrorException(data.message);
     }
     return (await res.json()) as string[];
   }
@@ -94,6 +97,7 @@ export class RemoteProductRepository implements ProductRepositoryPort {
   async save(product: Product): Promise<void> {
     throw new Error("Method not implemented.");
   }
+
   async update(id: string, product: Product): Promise<void> {
     throw new Error("Method not implemented.");
   }

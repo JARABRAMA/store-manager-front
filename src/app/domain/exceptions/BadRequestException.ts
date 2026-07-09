@@ -1,4 +1,4 @@
-export class ServerErrorException extends Error {
+export class BadRequestException extends Error {
   constructor(message: string) {
     super(message);
   }
