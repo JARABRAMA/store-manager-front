@@ -8,6 +8,7 @@ import { ProductResponseMapper } from "./mapper/ProductResponseMapper";
 import { ConnectionFailedException } from "../domain/exceptions/ConnectionFailedException";
 import { ServerErrorException } from "../domain/exceptions/ServerErrorException";
 import { BadRequestException } from "../domain/exceptions/BadRequestException";
+import { PageResponseMapper } from "./mapper/PageResponseMapper";
 
 export class RemoteProductRepository implements ProductRepositoryPort {
   private readonly serviceUrl: string;
@@ -46,21 +47,10 @@ export class RemoteProductRepository implements ProductRepositoryPort {
     }
 
     const pageResponse: PageResponse<ProductResponse> = await res.json();
-    return this.mapPageResponseToDomainPage(pageResponse);
-  }
-
-  private mapPageResponseToDomainPage(
-    page: PageResponse<ProductResponse>,
-  ): Page<Product> {
-    return {
-      content: page.content.map((p) => ProductResponseMapper.toDomain(p)),
-      page: page.page,
-      size: page.size,
-      totalElements: page.totalElements,
-      totalPages: page.totalPages,
-      first: page.first,
-      last: page.last,
-    };
+    return PageResponseMapper.toDomain(
+      pageResponse,
+      ProductResponseMapper.toDomain,
+    );
   }
 
   private getFilterProductsURLParams(
