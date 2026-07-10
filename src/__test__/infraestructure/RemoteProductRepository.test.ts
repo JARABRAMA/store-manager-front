@@ -8,6 +8,8 @@ import type { ErrorResponse } from "../../app/infraestructure/dto/ErrorResponse"
 import { BadRequestException } from "../../app/domain/exceptions/BadRequestException";
 import { ServerErrorException } from "../../app/domain/exceptions/ServerErrorException";
 import { ConnectionFailedException } from "../../app/domain/exceptions/ConnectionFailedException";
+import { randIntExclusive } from "../TestUtils";
+import { __unstable__loadDesignSystem } from "tailwindcss";
 
 describe("RemoteProductRepository", () => {
   const serviceUrl = "http://service-test";
@@ -176,6 +178,106 @@ describe("RemoteProductRepository", () => {
       } catch (e) {
         expect(e).toBeInstanceOf(ConnectionFailedException);
       }
+    });
+  });
+
+  describe("findProductById", () => {
+    const productResponse: ProductResponse = {
+      categories: ["category1", "category2"],
+      description: "a short description",
+      id: "123",
+      imageUrl: "http://image.jpg",
+      name: "product 1",
+      stock: 3,
+      price: 4_500,
+    };
+
+    it("Should return connection error exception when connection error", async () => {
+      fetchMock.mockRejectedValue(new Error("Connection error"));
+
+      try {
+        await repository.findById("any");
+        expect.fail();
+      } catch (e) {
+        expect(e).toBeInstanceOf(ConnectionFailedException);
+      }
+    });
+
+    it("Should return bad request exception when http status between 400 and 499", async () => {
+      const randBadRequestStatus = randIntExclusive(400, 500);
+      const response: ErrorResponse = {
+        message: "Bad request",
+        status: randBadRequestStatus,
+      };
+      fetchMock.mockResolvedValue(
+        new Response(JSON.stringify(response), {
+          status: response.status,
+          headers: { "Content-Type": "application/json" },
+        }),
+      );
+
+      try {
+        await repository.findById("any");
+        expect.fail();
+      } catch (e) {
+        expect(e).toBeInstanceOf(BadRequestException);
+        expect((e as BadRequestException).message).toBe(response.message);
+      }
+    });
+
+    it("Should return service error exception when http status equals or greatest than 500", async () => {
+      const randHttpStatus = randIntExclusive(500, 599);
+      const response: ErrorResponse = {
+        message: "Server error",
+        status: randHttpStatus,
+      };
+
+      fetchMock.mockResolvedValue(
+        new Response(JSON.stringify(response), {
+          status: response.status,
+          headers: { "Content-Type": "application/json" },
+        }),
+      );
+
+      try {
+        await repository.findById("any");
+        expect.fail();
+      } catch (e) {
+        expect(e).instanceOf(ServerErrorException);
+        expect((e as ServerErrorException).message).toBe(response.message);
+      }
+    });
+
+    it("Should return a product when server response is ok", async () => {
+      const productResponse: ProductResponse = {
+        categories: ["category1", "category2"],
+        description: "a short description",
+        id: "123",
+        imageUrl: "http://image.jpg",
+        name: "product 1",
+        stock: 3,
+        price: 4_500,
+      };
+
+      const expectedProduct: Product = {
+        categories: ["category1", "category2"],
+        description: "a short description",
+        id: "123",
+        imageUrl: "http://image.jpg",
+        name: "product 1",
+        stock: 3,
+        price: 4_500,
+      };
+
+      fetchMock.mockResolvedValue(
+        new Response(JSON.stringify(productResponse), {
+          status: 200,
+          headers: { "Content-Type": "application/json" },
+        }),
+      );
+
+      const actual = await repository.findById("123");
+      expect(actual).toEqual(expectedProduct);
     });
   });
 });

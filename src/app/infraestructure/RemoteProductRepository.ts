@@ -76,7 +76,23 @@ export class RemoteProductRepository implements ProductRepositoryPort {
   }
 
   async findById(id: string): Promise<Product> {
-    throw new Error("Method not implemented.");
+    let res: Response;
+    try {
+      res = await this.fetchFn(`${this.serviceUrl}/api/products/${id}`);
+    } catch (e) {
+      if (e instanceof Error) console.log(`Repository: ${e.message}`);
+      throw new ConnectionFailedException();
+    }
+    if (!res.ok) {
+      const data = (await res.json()) as ErrorResponse;
+      if (data.status >= 400 && data.status < 500) {
+        throw new BadRequestException(data.message);
+      } else {
+        throw new ServerErrorException(data.message);
+      }
+    }
+    const data = (await res.json()) as ProductResponse;
+    return ProductResponseMapper.toDomain(data);
   }
 
   async findAllCategories(): Promise<string[]> {

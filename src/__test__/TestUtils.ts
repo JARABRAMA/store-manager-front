@@ -1,0 +1,6 @@
+// return a random number between min and (max -1)
+export function randIntExclusive(min: number, max: number): number {
+  min = Math.ceil(min);
+  max = Math.floor(max);
+  return Math.floor(Math.random() * (max - min)) + min;
+}
