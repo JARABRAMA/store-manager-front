@@ -9,7 +9,6 @@ import { BadRequestException } from "../../app/domain/exceptions/BadRequestExcep
 import { ServerErrorException } from "../../app/domain/exceptions/ServerErrorException";
 import { ConnectionFailedException } from "../../app/domain/exceptions/ConnectionFailedException";
 import { randIntExclusive } from "../TestUtils";
-import { __unstable__loadDesignSystem } from "tailwindcss";
 
 describe("RemoteProductRepository", () => {
   const serviceUrl = "http://service-test";
@@ -182,16 +181,6 @@ describe("RemoteProductRepository", () => {
   });
 
   describe("findProductById", () => {
-    const productResponse: ProductResponse = {
-      categories: ["category1", "category2"],
-      description: "a short description",
-      id: "123",
-      imageUrl: "http://image.jpg",
-      name: "product 1",
-      stock: 3,
-      price: 4_500,
-    };
-
     it("Should return connection error exception when connection error", async () => {
       fetchMock.mockRejectedValue(new Error("Connection error"));
 
