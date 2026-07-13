@@ -269,4 +269,74 @@ describe("RemoteProductRepository", () => {
       expect(actual).toEqual(expectedProduct);
     });
   });
+
+  describe("delete", () => {
+    it("Should return connection error when fetch error", async () => {
+      fetchMock.mockRejectedValue(new Error("Connection error"));
+
+      try {
+        await repository.delete("any");
+        expect.fail();
+      } catch (e) {
+        expect(e).toBeInstanceOf(ConnectionFailedException);
+        expect((e as Error).message).toEqual(
+          "Error de conexion por favor intenta más tarde",
+        );
+      }
+    });
+
+    it("Should return bad request error when Http Response between 400 and 499", async () => {
+      const response: ErrorResponse = {
+        message: "invalid id",
+        status: 400,
+      };
+      fetchMock.mockResolvedValue(
+        new Response(JSON.stringify(response), {
+          status: 400,
+          headers: { "Content-Type": "application/json" },
+        }),
+      );
+
+      try {
+        await repository.delete("any");
+      } catch (e) {
+        expect(e).toBeInstanceOf(BadRequestException);
+        expect((e as BadRequestException).message).toBe(response.message);
+      }
+    });
+    it("Should return server error exception when http response is bigger or equals than 500", async () => {
+      const response: ErrorResponse = {
+        message: "error del servidor",
+        status: 599,
+      };
+      fetchMock.mockResolvedValue(
+        new Response(JSON.stringify(response), {
+          status: 599,
+          headers: { "Content-Type": "application/json" },
+        }),
+      );
+
+      try {
+        await repository.delete("any");
+      } catch (e) {
+        expect(e).toBeInstanceOf(ServerErrorException);
+        expect((e as BadRequestException).message).toBe(response.message);
+      }
+    });
+
+    it("Should return message when ok response", async () => {
+      const response: { message: string } = {
+        message: "Producto eliminado exitosamente",
+      };
+      fetchMock.mockResolvedValue(
+        new Response(JSON.stringify(response), {
+          status: 200,
+          headers: { "Content-Type": "application/json" },
+        }),
+      );
+
+      const actualMessage = await repository.delete("any");
+      expect(actualMessage).toBe(response.message);
+    });
+  });
 });

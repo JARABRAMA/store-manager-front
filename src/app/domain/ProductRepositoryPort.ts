@@ -12,4 +12,5 @@ export interface ProductRepositoryPort {
 
   save(product: Product): Promise<void>;
   update(id: string, product: Product): Promise<void>;
+  delete(id: string): Promise<string>
 }
