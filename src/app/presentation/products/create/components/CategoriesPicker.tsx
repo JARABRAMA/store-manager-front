@@ -1,4 +1,4 @@
-import { CategoriesHeap } from "./CategoriesHeap";
+import { CategoriesHeap } from "../../shared/components/CategoriesHeap";
 import { CategorySelector } from "./CategorySelector";
 
 export type CategoriesPickerProps = {

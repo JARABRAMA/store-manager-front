@@ -1,10 +1,13 @@
+import { useNavigate } from "react-router";
 import type { Product } from "../../../../domain/model/Product";
 import { ImageWithPlaceholder } from "../../../shared/components/ImageWithPlaceholder";
 
 export function ProductCard(params: Product) {
   const { name, id, stock, price, imageUrl, description } = params;
+  const navigate = useNavigate() 
   return (
-    <div className="bg-slate-600 grid grid-cols-3 px-4 py-5 rounded-lg">
+    <div className="bg-slate-600 grid grid-cols-3 px-4 py-5 rounded-lg"
+    onClick={() => {navigate(`/products/${id}`)}}>
       <ImageWithPlaceholder
         src={imageUrl ?? ""}
         alt={`image of ${name}`}

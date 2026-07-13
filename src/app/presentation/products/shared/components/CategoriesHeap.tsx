@@ -2,7 +2,7 @@ import { IconButton } from "../../../shared/components/IconButton";
 
 export type CategoriesHeapProps = {
   selectedCategories: string[];
-  onRemoveCategory: (category: string) => void;
+  onRemoveCategory?: (category: string) => void;
 };
 
 export function CategoriesHeap({
@@ -10,9 +10,9 @@ export function CategoriesHeap({
   onRemoveCategory,
 }: CategoriesHeapProps) {
   return (
-    <div className="flex flex-wrap gap-2 items-center justify-center w-full col-span-2">
+    <div data-testid='category-heap' className="flex flex-wrap gap-2 items-center justify-center w-full col-span-2">
       {selectedCategories.map((category) => (
-        <CategoryPill category={category} onRemoveCategory={onRemoveCategory} />
+        <CategoryPill key={category} category={category} onRemoveCategory={onRemoveCategory} />
       ))}
     </div>
   );
@@ -20,16 +20,18 @@ export function CategoriesHeap({
 
 type CategoryPillProps = {
   category: string;
-  onRemoveCategory: (category: string) => void;
+  onRemoveCategory?: (category: string) => void;
 };
 function CategoryPill({ category, onRemoveCategory }: CategoryPillProps) {
   return (
     <div className="flex flex-wa bg-blue-200 rounded-xl px-2 text-black">
       <span>{category}</span>
-      <IconButton
+      {
+        onRemoveCategory && <IconButton
         icon="/sprite.svg#close"
         onClick={() => onRemoveCategory(category)}
       />
+      }
     </div>
   );
 }

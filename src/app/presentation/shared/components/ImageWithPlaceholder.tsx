@@ -18,12 +18,12 @@ export function ImageWithPlaceholder({
   };
 
   if (src !== null && src !== "" && !isError) {
-    return <img src={src} alt={alt} className={className} onError={onError} />;
+    return <img data-testid='real-image' src={src} alt={alt} className={className} onError={onError} />;
   }
 
   return (
-    <svg className={`bg-blue-50 text-gray-600 rounded-xl ${className}`}>
-      <use href="sprite.svg#polaroid" />
+    <svg data-testid='image-placeholder' className={`bg-blue-50 text-gray-600  ${className}`}>
+      <use href="/sprite.svg#polaroid" />
     </svg>
   );
 }

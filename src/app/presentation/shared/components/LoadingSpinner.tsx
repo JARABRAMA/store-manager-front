@@ -17,7 +17,8 @@ export function LoadingSpinner({
 }: LoadingSpinnerProps) {
   return (
     <div
-      className={`flex flex-col items-center justify-center gap-2 ${className}`}
+      data-testid="loading-spinner"
+      className={`flex flex-1 flex-col items-center justify-center gap-2 ${className}`}
     >
       <div
         className={`
