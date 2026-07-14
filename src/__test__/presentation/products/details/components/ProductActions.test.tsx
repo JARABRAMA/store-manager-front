@@ -1,6 +1,6 @@
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
-import { ProductActions } from "../../../../../app/presentation/products/create/components/ProductActions";
+import { ProductActions } from "../../../../../app/presentation/products/details/components/ProductActions";
 
 describe("Product Actions component testing", () => {
   

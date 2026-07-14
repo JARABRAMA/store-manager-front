@@ -1,6 +1,6 @@
 import type { Product } from "../../../../domain/model/Product";
 import { ImageWithPlaceholder } from "../../../shared/components/ImageWithPlaceholder";
-import { ProductActions } from "../../create/components/ProductActions";
+import { ProductActions } from "./ProductActions";
 import { CategoriesHeap } from "../../shared/components/CategoriesHeap";
 import { PricePill } from "./PricePIll";
 import { StockPill } from "./StockPill";
