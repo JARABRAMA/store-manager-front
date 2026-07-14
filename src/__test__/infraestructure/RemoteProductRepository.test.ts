@@ -118,7 +118,7 @@ describe("RemoteProductRepository", () => {
       }
     });
 
-    it("Shuld trow ConnectionFailedException when connection errors", async () => {
+    it("Should trow ConnectionFailedException when connection errors", async () => {
       fetchMock.mockRejectedValue(Error("connection error"));
 
       try {
