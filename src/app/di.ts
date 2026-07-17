@@ -1,3 +1,4 @@
+import { DeleteProductUseCase } from "./application/products/DeleteProductUseCase";
 import { FilterProductsUseCase } from "./application/products/FilterProductsUseCase";
 import { FindAllCategoriesUseCase } from "./application/products/FindAllCategoriesUseCase";
 import { FindByIdUseCase } from "./application/products/FindByIdUseCase";
@@ -15,3 +16,4 @@ export const filterProductsUseCase = FilterProductsUseCase(productRepository);
 export const findAllCategoriesUseCase =
   FindAllCategoriesUseCase(productRepository);
 export const findByIdUseCase = FindByIdUseCase(productRepository)
+export const deleteProductUseCase = DeleteProductUseCase({repository: productRepository})
