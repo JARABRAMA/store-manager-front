@@ -18,10 +18,17 @@ export function useDeleteProduct({ onDeleteProduct }: { onDeleteProduct: (id: st
     }
   }
 
+  const reset = () => {
+    setLoading(false)
+    setError(undefined)
+    setMessage(undefined)
+  }
+
   return {
     loading,
     error,
     message,
-    onDelete
+    onDelete,
+    reset
   }
 }

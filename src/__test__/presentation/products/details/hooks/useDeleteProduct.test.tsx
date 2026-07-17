@@ -49,4 +49,26 @@ describe("use delete product hook", () => {
     expect(result.current.error).toBeUndefined();
     expect(result.current.message).toBe(message);
   });
+
+
+  it('should reset values to default when reset after perform deleteAction', async () => {
+    const message = "product deleted successfully";
+    deleteProductUseCase.mockResolvedValue(message);
+
+    const { result } = renderHook(() =>
+      useDeleteProduct({ onDeleteProduct: deleteProductUseCase }),
+    );
+
+    await act(async () => {
+      await result.current.onDelete('any')
+    })
+
+    act(() => {
+      result.current.reset()
+    })
+
+    expect(result.current.loading).toBe(false)
+    expect(result.current.message).toBeUndefined()
+    expect(result.current.error).toBeUndefined()
+  })
 });
