@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useCategoriesPicker } from "./useCategoriesPicker";
+import type { Product } from "../../../../domain/model/Product";
 
 type NewProductFormData = {
   name: string;
@@ -11,7 +12,7 @@ type NewProductFormData = {
 
 type FormNames = "name" | "description" | "price" | "stock" | "imageUrl";
 
-export function useCreateNewProductForm() {
+export function useCreateNewProductForm({ onCreateProduct }: { onCreateProduct: (product: Product) => Promise<string> }) {
   const [formState, setFormState] = useState<NewProductFormData>({
     name: "",
     description: "",
