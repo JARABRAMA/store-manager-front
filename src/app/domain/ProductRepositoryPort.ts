@@ -10,7 +10,7 @@ export interface ProductRepositoryPort {
   findById(id: string): Promise<Product>;
   findAllCategories(): Promise<string[]>;
 
-  save(product: Product): Promise<void>;
+  save(product: Product): Promise<string>;
   update(id: string, product: Product): Promise<void>;
   delete(id: string): Promise<string>
 }

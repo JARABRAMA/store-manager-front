@@ -100,7 +100,7 @@ export class RemoteProductRepository implements ProductRepositoryPort {
     return (await res.json()) as string[];
   }
 
-  async save(product: Product): Promise<void> {
+  async save(product: Product): Promise<string> {
     throw new Error("Method not implemented.");
   }
 
