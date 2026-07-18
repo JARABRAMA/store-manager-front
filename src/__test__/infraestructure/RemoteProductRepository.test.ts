@@ -339,4 +339,97 @@ describe("RemoteProductRepository", () => {
       expect(actualMessage).toBe(response.message);
     });
   });
+
+  describe("save", () => {
+    const product = {
+      id: "1",
+      name: "Product 1",
+      price: 10,
+      categories: ["category"],
+      description: null,
+      stock: 0,
+      imageUrl: null,
+    };
+
+    it("when success should return message", async () => {
+      const message = "saved product";
+      const response = new Response(JSON.stringify({ message }), {
+        status: 202,
+        headers: {
+          "Content-Type": "application-json",
+        },
+      });
+
+      fetchMock.mockResolvedValue(response);
+
+      const actual = await repository.save(product);
+
+      expect(actual).toBe(message);
+    });
+
+    it("when 400 >= HTTP response < 500 should return bad request exception", async () => {
+      const message = "invalid input";
+      const status = randIntExclusive(400, 500);
+      console.log(status);
+      const errorResponse: ErrorResponse = {
+        message,
+        status,
+      };
+      const res = new Response(JSON.stringify(errorResponse), {
+        status,
+        headers: {
+          "Content-Type": "application-json",
+        },
+      });
+
+      fetchMock.mockResolvedValue(res);
+
+      try {
+        await repository.save(product);
+        expect.fail();
+      } catch (e) {
+        expect(e).toBeInstanceOf(BadRequestException);
+        expect((e as Error).message).toBe(message);
+      }
+    });
+
+    it("when 500 >= HTTP response < 599 should return server error exception", async () => {
+      const message = "invalid input";
+      const status = randIntExclusive(500, 600);
+      const errorResponse: ErrorResponse = {
+        message,
+        status,
+      };
+      const res = new Response(JSON.stringify(errorResponse), {
+        status,
+        headers: {
+          "Content-Type": "application-json",
+        },
+      });
+
+      fetchMock.mockResolvedValue(res);
+
+      try {
+        await repository.save(product);
+        expect.fail();
+      } catch (e) {
+        expect(e).toBeInstanceOf(ServerErrorException);
+        expect((e as ServerErrorException).message).toBe(message);
+      }
+    });
+
+    it("when connection error should return connection failed exception", async () => {
+      fetchMock.mockRejectedValue(new ConnectionFailedException());
+
+      try {
+        await repository.save(product);
+        expect.fail();
+      } catch (e) {
+        expect(e).toBeInstanceOf(ConnectionFailedException);
+        expect((e as Error).message).toEqual(
+          "Error de conexion por favor intenta más tarde",
+        );
+      }
+    });
+  });
 });
