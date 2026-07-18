@@ -4,7 +4,7 @@ import { CategoriesPicker } from "./CategoriesPicker";
 
 export function CreateNewProductForm() {
   const { formState, categoriesPickerState, onUpdateFormState } =
-    useCreateNewProductForm();
+    useCreateNewProductForm({ onCreateProduct: () => { } }); // TODO: replace with real use case implementation
   return (
     <form className="grid grid-cols-2 gap-2">
       <Input

@@ -1,8 +1,5 @@
 import { useEffect, useState } from "react";
-import {
-  filterProductsUseCase,
-  findAllCategoriesUseCase,
-} from "../../../di.ts";
+import { useCases } from "../../../di.ts";
 import type { Product } from "../../../domain/model/Product";
 import { useSearchParams } from "react-router";
 import { useDebounceValue } from "../../shared/hooks/useDebounceValue";
@@ -36,6 +33,8 @@ export function useFilterProduct(): FilterProductData {
   const debouncedSearch = useDebounceValue(search, 500);
   const { paginationData, onUpdatePaginationData } = usePagination();
   const { currentPage: page } = paginationData;
+
+  const { findAllCategoriesUseCase, filterProductsUseCase } = useCases;
 
   // load categories
   useEffect(() => {

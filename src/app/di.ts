@@ -12,8 +12,9 @@ const productRepository: ProductRepositoryPort = new RemoteProductRepository(
   window.fetch.bind(window),
 );
 
-export const filterProductsUseCase = FilterProductsUseCase(productRepository);
-export const findAllCategoriesUseCase =
-  FindAllCategoriesUseCase(productRepository);
-export const findByIdUseCase = FindByIdUseCase(productRepository)
-export const deleteProductUseCase = DeleteProductUseCase({repository: productRepository})
+export const useCases = {
+  filterProductsUseCase: FilterProductsUseCase(productRepository),
+  findAllCategoriesUseCase: FindAllCategoriesUseCase(productRepository),
+  findByIdUseCase: FindByIdUseCase(productRepository),
+  deleteProductUseCase: DeleteProductUseCase({ repository: productRepository }),
+};

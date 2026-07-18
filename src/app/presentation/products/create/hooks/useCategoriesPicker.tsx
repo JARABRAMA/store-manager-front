@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { findAllCategoriesUseCase } from "../../../../di.ts";
+import { useCases } from "../../../../di.ts";
 
 type CategoriesUIState = {
   categoriesLoading: boolean;
@@ -10,7 +10,9 @@ type CategoriesUIState = {
   onSelectCategory: (category: string) => void;
 };
 
-export function useCategoriesPicker(): CategoriesUIState {
+export function useCategoriesPicker(
+  findAllCategoriesUseCase: () => Promise<string[]> = useCases.findAllCategoriesUseCase,
+): CategoriesUIState {
   const [loading, setLoading] = useState(true);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [categories, setCategories] = useState<string[]>([]);

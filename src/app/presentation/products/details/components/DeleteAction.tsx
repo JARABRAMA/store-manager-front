@@ -4,13 +4,14 @@ import {
   type AlertDialogProps,
 } from "../../../shared/components/AlertDialog";
 import { useDeleteProduct } from "../hooks/useDeleteProduct";
-import { deleteProductUseCase } from "../../../../di";
+import { useCases } from "../../../../di";
 import { SimpleDialog } from "../../../shared/components/SimpleDialog";
 import { LoadingSpinner } from "../../../shared/components/LoadingSpinner";
 import { ErrorMessage } from "../../../shared/components/ErrorMessage";
 import { SuccessMessage } from "../../../shared/components/SuccessMessage";
 
 export function DeleteAction({ productId }: { productId: string }) {
+  const { deleteProductUseCase } = useCases
   const [openedDialog, setOpenedDialog] = useState(false);
   const { loading, error, message, onDelete, reset } = useDeleteProduct({
     onDeleteProduct: deleteProductUseCase,

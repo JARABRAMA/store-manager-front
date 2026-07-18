@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react"
 import type { FindByIdCommand } from "../../../application/products/FindByIdUseCase"
-import { findByIdUseCase } from "../../../di"
+import { useCases } from "../../../di"
 import type { Product } from "../../../domain/model/Product"
 import { useParams } from "react-router"
 
@@ -8,7 +8,7 @@ export type UseProductDetail = {
   findById: ({ id }: FindByIdCommand) => Promise<Product>,
 }
 
-export function useProductDetail({ findById = findByIdUseCase }: UseProductDetail) {
+export function useProductDetail({ findById = useCases.findByIdUseCase }: UseProductDetail) {
 
   const { productId } = useParams()
   const [product, setProduct] = useState<Product>()
@@ -20,10 +20,10 @@ export function useProductDetail({ findById = findByIdUseCase }: UseProductDetai
       setLoading(true)
       try {
         if (productId) {
-          const data = await findById({id: productId})
+          const data = await findById({ id: productId })
           setProduct(data)
         } else {
-         setError("Url invalida")
+          setError("Url invalida")
         }
       } catch (e) {
         const error = e as Error
