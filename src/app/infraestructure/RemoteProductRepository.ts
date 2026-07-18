@@ -101,7 +101,32 @@ export class RemoteProductRepository implements ProductRepositoryPort {
   }
 
   async save(product: Product): Promise<string> {
-    throw new Error("Method not implemented.");
+    let res: Response;
+    try {
+      res = await this.fetchFn(`${this.serviceUrl}/api/products`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application-json",
+        },
+        body:JSON.stringify(product)
+      });
+    } catch (e) {
+      console.log("Repository - save: ", (e as Error).message);
+      throw new ConnectionFailedException();
+    }
+
+    if (res.ok) {
+      const { message } = (await res.json()) as { message: string };
+      return message;
+    }
+    const errorResponse = await res.json() as ErrorResponse
+    console.log('error response: ', errorResponse.message)
+
+    if (errorResponse.status >= 400 && errorResponse.status < 500) {
+      throw new BadRequestException(errorResponse.message)
+    } else {
+      throw new ServerErrorException(errorResponse.message)
+    }
   }
 
   async update(id: string, product: Product): Promise<void> {
@@ -112,23 +137,23 @@ export class RemoteProductRepository implements ProductRepositoryPort {
     let response: Response;
     try {
       response = await this.fetchFn(`${this.serviceUrl}/api/products/${id}`, {
-        method: 'DELETE'
-      })
+        method: "DELETE",
+      });
     } catch (e: unknown) {
-      console.error('Delete - Repository: ', (e as Error).message)
-      throw new ConnectionFailedException()
+      console.error("Delete - Repository: ", (e as Error).message);
+      throw new ConnectionFailedException();
     }
-    
+
     if (!response.ok) {
-      const data = (await response.json()) as ErrorResponse
+      const data = (await response.json()) as ErrorResponse;
       if (data.status >= 400 && data.status < 500) {
-        throw new BadRequestException(data.message)
+        throw new BadRequestException(data.message);
       } else {
-        throw new ServerErrorException(data.message)
+        throw new ServerErrorException(data.message);
       }
     }
 
-    const data: {message: string} = await response.json();
-    return data.message
+    const data: { message: string } = await response.json();
+    return data.message;
   }
 }
