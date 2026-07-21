@@ -211,7 +211,7 @@ describe("Create new product component", () => {
     const form = screen.getByTestId("form");
 
     await act(async () => {
-      fireEvent.input(imageInput, { target: { input: "image-url invalid" } });
+      fireEvent.input(imageInput, { target: { value: "image-url invalid" } });
       fireEvent.submit(form);
     });
 
@@ -219,4 +219,17 @@ describe("Create new product component", () => {
 
     expect(screen.getByText("La URL de la imagen no tiene un formato válido"));
   });
+
+  it('should not appear error message when description and category are void', async () => {
+    render(<CreateNewProductForm />)
+
+    const form = screen.getByTestId('form')
+
+    await act(async () => {
+      fireEvent.submit(form)
+    })
+
+    expect(screen.queryByTestId('input-error-description')).not.toBeInTheDocument()
+    expect(screen.queryByTestId('input-error-imageUrl')).not.toBeInTheDocument()
+  })
 });
