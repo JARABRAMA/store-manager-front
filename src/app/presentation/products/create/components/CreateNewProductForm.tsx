@@ -1,41 +1,68 @@
+import { useForm, type SubmitHandler } from "react-hook-form";
 import { Input } from "../../../shared/components/Input";
-import { useCreateNewProductForm } from "../hooks/useCreateNewProductForm";
+import { useCategoriesPicker } from "../hooks/useCategoriesPicker";
+import {
+  newProductSchema,
+  type NewProductFormData,
+} from "../schemas/NewProductSchema";
 import { CategoriesPicker } from "./CategoriesPicker";
+import { zodResolver } from "@hookform/resolvers/zod";
 
 export function CreateNewProductForm() {
-  const { formState, categoriesPickerState, onUpdateFormState } =
-    useCreateNewProductForm({ onCreateProduct: () => { } }); // TODO: replace with real use case implementation
+  const categoriesPickerState = useCategoriesPicker();
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<NewProductFormData>({
+    resolver: zodResolver(newProductSchema),
+  });
+
+  const onSubmit: SubmitHandler<NewProductFormData> = (data) => {
+    console.log(data);
+    // todo: nothing jet
+  };
   return (
-    <form className="grid grid-cols-2 gap-2">
+    <form
+      noValidate
+      onSubmit={handleSubmit(onSubmit)}
+      data-testid="form"
+      className="grid grid-cols-2 gap-2"
+    >
       <Input
+        name="name"
         className="col-span-2"
         label="Nombre"
-        name="name"
-        required
         placeholder="Papas margarita 100gr"
+        register={register}
+        error={errors.name}
       />
       <Input
+        register={register}
+        error={errors.description}
         className="col-span-2"
         label="Descripcion"
         name="description"
-        required
         placeholder="Papas fritas margarita paquete de 100gr"
       />
       <Input
+        register={register}
+        error={errors.price}
         label="Precio"
         name="price"
-        required
         placeholder="2200"
-        type="number"
       />
       <Input
-        label="Unidades disponibles"
         name="stock"
-        required
+        register={register}
+        error={errors.stock}
+        label="Unidades disponibles"
         placeholder="12"
-        type="number"
       />
       <Input
+        register={register}
+        error={errors.imageUrl}
         className="col-span-2"
         label="Url de imagen"
         name="imageUrl"
