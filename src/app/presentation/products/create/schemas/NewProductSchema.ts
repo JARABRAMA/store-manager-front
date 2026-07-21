@@ -32,8 +32,13 @@ export const newProductSchema = z.object({
   description: z
     .string()
     .max(100, "La descripción del producto no puede superar los 100 caracteres")
+    .refine((val) => val.split(" ").length >= 5, {
+      message: "La descripción del producto debe contener al menos 5 palabras",
+    })
     .optional(),
-  imageUrl: z.url(),
+  imageUrl: z
+    .string()
+    .pipe(z.url("La URL de la imagen no tiene un formato válido")),
 });
 
 export type NewProductFormData = z.infer<typeof newProductSchema>;

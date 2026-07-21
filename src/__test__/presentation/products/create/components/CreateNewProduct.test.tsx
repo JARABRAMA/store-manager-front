@@ -180,6 +180,30 @@ describe("Create new product component", () => {
     );
   });
 
+  it("should advise to user that description should contains at least 5 words", async () => {
+    render(<CreateNewProductForm />);
+
+    const form = screen.getByTestId("form");
+    const descriptionInput = screen.getByTestId("input-description");
+
+    await act(async () => {
+      fireEvent.input(descriptionInput, {
+        target: { value: "less than 5 words" },
+      });
+      fireEvent.submit(form);
+    });
+
+    await waitFor(() =>
+      expect(screen.getByTestId("input-error-description")).toBeInTheDocument(),
+    );
+
+    expect(
+      screen.getByText(
+        "La descripción del producto debe contener al menos 5 palabras",
+      ),
+    ).toBeInTheDocument();
+  });
+
   it("should advice that image url format is invalid", async () => {
     render(<CreateNewProductForm />);
 
@@ -188,11 +212,11 @@ describe("Create new product component", () => {
 
     await act(async () => {
       fireEvent.input(imageInput, { target: { input: "image-url invalid" } });
-      fireEvent.submit(form)
+      fireEvent.submit(form);
     });
 
-    await waitFor(() => expect(screen.queryByTestId('input-error-imageUrl')))
+    await waitFor(() => expect(screen.queryByTestId("input-error-imageUrl")));
 
-    expect(screen.getByTestId('La URL de la imagen no tiene un formato válido'))
+    expect(screen.getByText("La URL de la imagen no tiene un formato válido"));
   });
 });
