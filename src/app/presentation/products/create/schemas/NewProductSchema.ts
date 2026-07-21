@@ -28,17 +28,34 @@ export const newProductSchema = z.object({
         .number("El precio del producto debe ser un número")
         .min(100, "El precio del producto debe ser mayor a 100 pesos"),
     ),
+  description: z.preprocess(
+    (val) => {
+      if (typeof val !== "string") return undefined;
+      const trimmed = val.trim();
+      return trimmed === "" ? undefined : trimmed;
+    },
+    z
+      .string()
+      .max(
+        100,
+        "La descripción del producto no puede superar los 100 caracteres",
+      )
+      .refine((val) => val.split(/\s+/).length >= 5, {
+        message:
+          "La descripción del producto debe contener al menos 5 palabras",
+      })
+      .optional(),
+  ),
 
-  description: z
-    .string()
-    .max(100, "La descripción del producto no puede superar los 100 caracteres")
-    .refine((val) => val.split(" ").length >= 5, {
-      message: "La descripción del producto debe contener al menos 5 palabras",
-    })
-    .optional(),
   imageUrl: z
     .string()
-    .pipe(z.url("La URL de la imagen no tiene un formato válido")),
+    .transform((val) => {
+      return val.trim() === "" ? undefined : val.trim();
+    })
+    .refine((val) => !val || z.url().safeParse(val).success, {
+      message: "La URL de la imagen no tiene un formato válido",
+    })
+    .optional(),
 });
 
 export type NewProductFormData = z.infer<typeof newProductSchema>;
