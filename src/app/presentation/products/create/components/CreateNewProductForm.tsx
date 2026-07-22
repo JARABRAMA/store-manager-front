@@ -1,32 +1,24 @@
-import { useForm, type SubmitHandler } from "react-hook-form";
+import { useCases } from "../../../../di";
 import { Input } from "../../../shared/components/Input";
-import { useCategoriesPicker } from "../hooks/useCategoriesPicker";
-import {
-  newProductSchema,
-  type NewProductFormData,
-} from "../schemas/NewProductSchema";
+import { useCreateNewProductForm } from "../hooks/useCreateNewProductForm";
 import { CategoriesPicker } from "./CategoriesPicker";
-import { zodResolver } from "@hookform/resolvers/zod";
+
 
 export function CreateNewProductForm() {
-  const categoriesPickerState = useCategoriesPicker();
-
+  const saveProductUseCase = useCases.saveProductUseCase;
   const {
+    onSubmit,
     register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<NewProductFormData>({
-    resolver: zodResolver(newProductSchema),
-  });
+    message,
+    errors,
+    isSubmitting,
+    categoriesPickerState,
+  } = useCreateNewProductForm({ saveProductUseCase: saveProductUseCase });
 
-  const onSubmit: SubmitHandler<NewProductFormData> = (data) => {
-    console.log(data);
-    // todo: nothing jet
-  };
   return (
     <form
       noValidate
-      onSubmit={handleSubmit(onSubmit)}
+      onSubmit={onSubmit}
       data-testid="form"
       className="grid grid-cols-2 gap-2"
     >
@@ -75,8 +67,11 @@ export function CreateNewProductForm() {
         selectedCategories={categoriesPickerState.selectedCategories}
       />
 
-      <button className="col-span-2 justify-self-end  px-3 py-1 rounded-md self-end bg-blue-600 w-fit">
-        Guardar
+      <button
+        disabled={isSubmitting}
+        className="col-span-2 justify-self-end disabled:opacity-30 px-3 py-1 rounded-md self-end bg-blue-600 w-fit"
+      >
+        {isSubmitting ? "Cargando..." : "Guardar"}
       </button>
     </form>
   );

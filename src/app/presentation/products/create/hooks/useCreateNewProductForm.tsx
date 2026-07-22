@@ -1,37 +1,52 @@
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
-import { useCategoriesPicker } from "./useCategoriesPicker";
+import {
+  useForm,
+  type SubmitHandler
+} from "react-hook-form";
+import { useCases } from "../../../../di";
 import type { Product } from "../../../../domain/model/Product";
+import {
+  newProductSchema,
+  type NewProductFormData,
+} from "../schemas/NewProductSchema";
+import { useCategoriesPicker } from "./useCategoriesPicker";
 
-type NewProductFormData = {
-  name: string;
-  description: string;
-  price: string;
-  stock: string;
-  imageUrl: string;
-};
-
-type FormNames = "name" | "description" | "price" | "stock" | "imageUrl";
-
-export function useCreateNewProductForm({ onCreateProduct }: { onCreateProduct: (product: Product) => Promise<string> }) {
-  const [formState, setFormState] = useState<NewProductFormData>({
-    name: "",
-    description: "",
-    price: "",
-    stock: "",
-    imageUrl: "",
+export function useCreateNewProductForm({
+  saveProductUseCase = useCases.saveProductUseCase,
+}: {
+  saveProductUseCase?: (product: Product) => Promise<string>;
+}) {
+  const categoriesPickerState = useCategoriesPicker();
+  const [message, setMessage] = useState<string>();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm<NewProductFormData>({
+    resolver: zodResolver(newProductSchema),
   });
-  const categoriesState = useCategoriesPicker();
 
-  const onUpdateFormState = (name: FormNames, value: string) => {
-    setFormState((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+  const onSubmit: SubmitHandler<NewProductFormData> = async (data) => {
+    const product: Product = {
+      ...data,
+      id: null,
+      categories: categoriesPickerState.selectedCategories,
+    } as unknown as Product;
+    try {
+      const message = await saveProductUseCase(product);
+      setMessage(message);
+    } catch (e) {
+      console.log(e);
+    }
   };
 
   return {
-    formState,
-    onUpdateFormState,
-    categoriesPickerState: categoriesState,
+    onSubmit: handleSubmit(onSubmit),
+    register,
+    message,
+    errors,
+    isSubmitting,
+    categoriesPickerState,
   };
 }
