@@ -106,9 +106,9 @@ export class RemoteProductRepository implements ProductRepositoryPort {
       res = await this.fetchFn(`${this.serviceUrl}/api/products`, {
         method: "POST",
         headers: {
-          "Content-Type": "application-json",
+          "Content-Type": "application/json",
         },
-        body:JSON.stringify(product)
+        body: JSON.stringify(product),
       });
     } catch (e) {
       console.log("Repository - save: ", (e as Error).message);
@@ -119,13 +119,13 @@ export class RemoteProductRepository implements ProductRepositoryPort {
       const { message } = (await res.json()) as { message: string };
       return message;
     }
-    const errorResponse = await res.json() as ErrorResponse
-    console.log('error response: ', errorResponse.message)
+    const errorResponse = (await res.json()) as ErrorResponse;
+    console.log("error response: ", errorResponse.message);
 
     if (errorResponse.status >= 400 && errorResponse.status < 500) {
-      throw new BadRequestException(errorResponse.message)
+      throw new BadRequestException(errorResponse.message);
     } else {
-      throw new ServerErrorException(errorResponse.message)
+      throw new ServerErrorException(errorResponse.message);
     }
   }
 
