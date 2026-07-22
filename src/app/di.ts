@@ -2,6 +2,7 @@ import { DeleteProductUseCase } from "./application/products/DeleteProductUseCas
 import { FilterProductsUseCase } from "./application/products/FilterProductsUseCase";
 import { FindAllCategoriesUseCase } from "./application/products/FindAllCategoriesUseCase";
 import { FindByIdUseCase } from "./application/products/FindByIdUseCase";
+import { SaveProductUseCase } from "./application/products/SaveProductUseCase";
 import type { ProductRepositoryPort } from "./domain/ProductRepositoryPort";
 import { RemoteProductRepository } from "./infraestructure/RemoteProductRepository";
 
@@ -17,4 +18,5 @@ export const useCases = {
   findAllCategoriesUseCase: FindAllCategoriesUseCase(productRepository),
   findByIdUseCase: FindByIdUseCase(productRepository),
   deleteProductUseCase: DeleteProductUseCase({ repository: productRepository }),
+  saveProductUseCase: SaveProductUseCase({ repository: productRepository }),
 };
