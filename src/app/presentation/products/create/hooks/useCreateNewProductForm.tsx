@@ -18,7 +18,7 @@ export function useCreateNewProductForm({
   saveProductUseCase?: (product: Product) => Promise<string>;
 }) {
   const categoriesPickerState = useCategoriesPicker();
-  const [message, setMessage] = useState<string>();
+  const [successMessage, setMessage] = useState<string>();
   const {
     register,
     handleSubmit,
@@ -44,7 +44,7 @@ export function useCreateNewProductForm({
   return {
     onSubmit: handleSubmit(onSubmit),
     register,
-    message,
+    successMessage,
     errors,
     isSubmitting,
     categoriesPickerState,
