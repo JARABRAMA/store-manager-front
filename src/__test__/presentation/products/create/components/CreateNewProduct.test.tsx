@@ -5,10 +5,12 @@ import {
   screen,
   waitFor,
 } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { CreateNewProductForm } from "../../../../../app/presentation/products/create/components/CreateNewProductForm";
 
+
 describe("Create new product component", () => {
+
   it("should show error when name has more than 50 characters", async () => {
     render(<CreateNewProductForm />);
 
@@ -220,16 +222,24 @@ describe("Create new product component", () => {
     expect(screen.getByText("La URL de la imagen no tiene un formato válido"));
   });
 
-  it('should not appear error message when description and category are void', async () => {
-    render(<CreateNewProductForm />)
+  it("should not appear error message when description and category are void", async () => {
+    render(<CreateNewProductForm />);
 
-    const form = screen.getByTestId('form')
+    const form = screen.getByTestId("form");
 
     await act(async () => {
-      fireEvent.submit(form)
-    })
+      fireEvent.submit(form);
+    });
 
-    expect(screen.queryByTestId('input-error-description')).not.toBeInTheDocument()
-    expect(screen.queryByTestId('input-error-imageUrl')).not.toBeInTheDocument()
-  })
+    expect(
+      screen.queryByTestId("input-error-description"),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByTestId("input-error-imageUrl"),
+    ).not.toBeInTheDocument();
+  });
+
+  it("should appear success message in a dialog when save product", async () => { })
+
+
 });
