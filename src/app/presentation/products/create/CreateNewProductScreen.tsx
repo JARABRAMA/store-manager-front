@@ -6,7 +6,8 @@ export function CreateNewProductScreen() {
   const navigate = useNavigate();
   const navigateBack = () => {
     navigate(-1);
-  };
+  }; // I pass the navigation function from here for 
+  // enhance testability
   return (
     <main className="flex flex-col flex-1 gap-2 bg-gray-900 text-gray-100  min-h-0">
       <TopBar title="Agregar producto nuevo" navigateBack />
