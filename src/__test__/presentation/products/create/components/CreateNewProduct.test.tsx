@@ -5,12 +5,19 @@ import {
   screen,
   waitFor,
 } from "@testing-library/react";
-import { describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+import { useCases } from "../../../../../app/di";
 import { CreateNewProductForm } from "../../../../../app/presentation/products/create/components/CreateNewProductForm";
 
+vi.mock("../../../../../app/di", () => ({
+  useCases: {
+    saveProductUseCase: vi.fn(),
+  },
+}));
+
+const mockSaveProductUseCase = vi.mocked(useCases.saveProductUseCase);
 
 describe("Create new product component", () => {
-
   it("should show error when name has more than 50 characters", async () => {
     render(<CreateNewProductForm />);
 
@@ -80,6 +87,14 @@ describe("Create new product component", () => {
         "El nombre del producto debe tener al menos 3 caracteres",
       ),
     );
+  });
+
+  it("success dialog should be hided when no success message", () => {
+    render(<CreateNewProductForm />);
+    const dialog = screen.getByTestId("simple-dialog");
+
+    expect(dialog).toBeInTheDocument();
+    expect(dialog).not.toHaveAttribute("open", "");
   });
 
   it("should advice the user that stock and price should be numbers", async () => {
@@ -239,7 +254,74 @@ describe("Create new product component", () => {
     ).not.toBeInTheDocument();
   });
 
-  it("should appear success message in a dialog when save product", async () => { })
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
 
+  it("should appear success message in a dialog when save product", async () => {
+    const message = "saved product";
+    mockSaveProductUseCase.mockResolvedValue(message);
+    render(<CreateNewProductForm />);
 
+    // give a valid product
+    const nameInput = screen.getByTestId("input-name");
+    const priceInput = screen.getByTestId("input-price");
+    const stockInput = screen.getByTestId("input-stock");
+    const descriptionInput = screen.getByTestId("input-description");
+
+    const form = screen.getByTestId("form");
+    await act(async () => {
+      // fill the inputs
+      fireEvent.input(nameInput, { target: { value: "Fries Potatoes" } });
+      fireEvent.input(stockInput, { target: { value: "21" } });
+      fireEvent.input(priceInput, { target: { value: "2400" } });
+      fireEvent.input(descriptionInput, {
+        target: { value: "fires potatoes with lemon flavor 1000gr" },
+      });
+
+      // submit the form
+      fireEvent.submit(form);
+    });
+    const successDialog = screen.queryByTestId("simple-dialog");
+    await waitFor(() => expect(successDialog).toBeInTheDocument());
+
+    expect(mockSaveProductUseCase).toHaveBeenCalledOnce();
+    expect(successDialog).toHaveAttribute("open", "");
+    expect(screen.getByText(message)).toBeInTheDocument();
+  });
+
+  it("success dialog should be hided when click on on close dialog button", async () => {
+    const message = "saved product";
+    mockSaveProductUseCase.mockResolvedValue(message);
+    render(<CreateNewProductForm />);
+
+    // give a valid product
+    const nameInput = screen.getByTestId("input-name");
+    const priceInput = screen.getByTestId("input-price");
+    const stockInput = screen.getByTestId("input-stock");
+    const descriptionInput = screen.getByTestId("input-description");
+
+    const form = screen.getByTestId("form");
+    await act(async () => {
+      // fill the inputs
+      fireEvent.input(nameInput, { target: { value: "Fries Potatoes" } });
+      fireEvent.input(stockInput, { target: { value: "21" } });
+      fireEvent.input(priceInput, { target: { value: "2400" } });
+      fireEvent.input(descriptionInput, {
+        target: { value: "fires potatoes with lemon flavor 1000gr" },
+      });
+
+      // submit the form
+      fireEvent.submit(form);
+    });
+
+    const closeButton = screen.getByTestId('close-button')
+    const dialog = screen.getByTestId('simple-dialog')
+    await act(async () => {
+      fireEvent.click(closeButton)
+    })
+
+    expect(dialog).toBeInTheDocument()
+    expect(dialog).not.toHaveAttribute('open')
+  });
 });

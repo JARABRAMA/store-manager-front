@@ -18,7 +18,7 @@ export function useCreateNewProductForm({
   saveProductUseCase?: (product: Product) => Promise<string>;
 }) {
   const categoriesPickerState = useCategoriesPicker();
-  const [successMessage, setMessage] = useState<string>();
+  const [successMessage, setSuccessMessage] = useState<string>();
   const {
     register,
     handleSubmit,
@@ -35,11 +35,16 @@ export function useCreateNewProductForm({
     } as unknown as Product;
     try {
       const message = await saveProductUseCase(product);
-      setMessage(message);
+      setSuccessMessage(message);
+      console.log('success message was set: ', message)
     } catch (e) {
       console.log(e);
     }
   };
+
+  const onDismissSuccessMessage = () => {
+    setSuccessMessage(undefined)
+  }
 
   return {
     onSubmit: handleSubmit(onSubmit),
@@ -48,5 +53,6 @@ export function useCreateNewProductForm({
     errors,
     isSubmitting,
     categoriesPickerState,
+    onDismissSuccessMessage
   };
 }

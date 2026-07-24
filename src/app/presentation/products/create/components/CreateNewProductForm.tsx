@@ -1,9 +1,15 @@
 import { useCases } from "../../../../di";
 import { Input } from "../../../shared/components/Input";
+import { SimpleDialog } from "../../../shared/components/SimpleDialog";
+import { SuccessMessage } from "../../../shared/components/SuccessMessage";
 import { useCreateNewProductForm } from "../hooks/useCreateNewProductForm";
 import { CategoriesPicker } from "./CategoriesPicker";
 
-export function CreateNewProductForm() {
+export function CreateNewProductForm({
+  navigateBack,
+}: {
+  navigateBack?: () => void;
+}) {
   const saveProductUseCase = useCases.saveProductUseCase;
   const {
     onSubmit,
@@ -12,6 +18,7 @@ export function CreateNewProductForm() {
     errors,
     isSubmitting,
     categoriesPickerState,
+    onDismissSuccessMessage,
   } = useCreateNewProductForm({ saveProductUseCase: saveProductUseCase });
 
   return (
@@ -74,6 +81,17 @@ export function CreateNewProductForm() {
           {isSubmitting ? "Cargando..." : "Guardar"}
         </button>
       </form>
+      <SimpleDialog
+        open={successMessage !== undefined}
+        onClose={() => {
+          onDismissSuccessMessage();
+          if (navigateBack) {
+            navigateBack();
+          }
+        }}
+      >
+        <SuccessMessage message={successMessage!} />
+      </SimpleDialog>
     </>
   );
 }
