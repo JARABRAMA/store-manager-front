@@ -4,7 +4,7 @@ import { beforeEach, describe, expect, it, vi, type Mock } from "vitest";
 import type { FindByIdCommand } from "../../../../app/application/products/FindByIdUseCase";
 import { ServerErrorException } from "../../../../app/domain/exceptions/ServerErrorException";
 import type { Product } from "../../../../app/domain/model/Product";
-import { useProductDetail } from "../../../../app/presentation/products/details/useProductDetail";
+import { useProductDetail } from "../../../../app/presentation/shared/hooks/useProductDetail";
 
 function wrapper({
   children,

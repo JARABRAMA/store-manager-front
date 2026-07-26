@@ -1,11 +1,11 @@
 import { describe, vi, it, expect } from "vitest";
-import { useProductDetail } from "../../../../app/presentation/products/details/useProductDetail";
+import { useProductDetail } from "../../../../app/presentation/shared/hooks/useProductDetail";
 import { ProductDetailScreen } from "../../../../app/presentation/products/details/ProductDetailScreen";
 import { render, screen } from "@testing-library/react";
 import { MemoryRouter, Route, Routes } from "react-router";
 
 vi.mock(
-  "../../../../app/presentation/products/details/useProductDetail",
+  "../../../../app/presentation/shared/hooks/useProductDetail",
   () => ({ useProductDetail: vi.fn() }),
 );
 
