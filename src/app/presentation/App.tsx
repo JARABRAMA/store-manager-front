@@ -4,7 +4,7 @@ import { FilterProductsScreen } from "./products/filter/FilterProductsScreeen";
 import { NavigationBar } from "./shared/components/NavigationBar";
 import { CreateNewProductScreen } from "./products/create/CreateNewProductScreen";
 import { ProductDetailScreen } from "./products/details/ProductDetailScreen";
-import { UpdateNewProductScreen } from "./products/update/UpdateProductScreen";
+import { UpdateProductScreen } from "./products/update/UpdateProductScreen";
 
 function App() {
   return (
@@ -16,7 +16,7 @@ function App() {
         <Route path="/products/create" element={<CreateNewProductScreen />} />
         <Route
           path="/products/update/:productId?"
-          element={<UpdateNewProductScreen />}
+          element={<UpdateProductScreen />}
         />
       </Routes>
       <NavigationBar />
