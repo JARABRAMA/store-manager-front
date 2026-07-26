@@ -4,7 +4,7 @@ import { FilterProductsScreen } from "./products/filter/FilterProductsScreeen";
 import { NavigationBar } from "./shared/components/NavigationBar";
 import { CreateNewProductScreen } from "./products/create/CreateNewProductScreen";
 import { ProductDetailScreen } from "./products/details/ProductDetailScreen";
-import { UpdateNewProductScreen } from "./products/update/UpdateProductScree";
+import { UpdateNewProductScreen } from "./products/update/UpdateProductScreen";
 
 function App() {
   return (
