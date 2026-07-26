@@ -1,9 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
-import {
-  useForm,
-  type SubmitHandler
-} from "react-hook-form";
+import { useForm, type SubmitHandler } from "react-hook-form";
 import { useCases } from "../../../../di";
 import type { Product } from "../../../../domain/model/Product";
 import {
@@ -22,6 +19,7 @@ export function useCreateNewProductForm({
   const {
     register,
     handleSubmit,
+    setError,
     formState: { errors, isSubmitting },
   } = useForm<NewProductFormData>({
     resolver: zodResolver(newProductSchema),
@@ -36,15 +34,18 @@ export function useCreateNewProductForm({
     try {
       const message = await saveProductUseCase(product);
       setSuccessMessage(message);
-      console.log('success message was set: ', message)
     } catch (e) {
-      console.log(e);
+      const error = e as Error;
+      setError("root", {
+        type: "server",
+        message: error.message,
+      });
     }
   };
 
   const onDismissSuccessMessage = () => {
-    setSuccessMessage(undefined)
-  }
+    setSuccessMessage(undefined);
+  };
 
   return {
     onSubmit: handleSubmit(onSubmit),
@@ -53,6 +54,6 @@ export function useCreateNewProductForm({
     errors,
     isSubmitting,
     categoriesPickerState,
-    onDismissSuccessMessage
+    onDismissSuccessMessage,
   };
 }

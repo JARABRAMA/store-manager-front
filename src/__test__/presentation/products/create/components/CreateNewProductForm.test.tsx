@@ -8,6 +8,7 @@ import {
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { useCases } from "../../../../../app/di";
 import { CreateNewProductForm } from "../../../../../app/presentation/products/create/components/CreateNewProductForm";
+import { ServerErrorException } from "../../../../../app/domain/exceptions/ServerErrorException";
 
 vi.mock("../../../../../app/di", () => ({
   useCases: {
@@ -263,25 +264,7 @@ describe("Create new product component", () => {
     mockSaveProductUseCase.mockResolvedValue(message);
     render(<CreateNewProductForm />);
 
-    // give a valid product
-    const nameInput = screen.getByTestId("input-name");
-    const priceInput = screen.getByTestId("input-price");
-    const stockInput = screen.getByTestId("input-stock");
-    const descriptionInput = screen.getByTestId("input-description");
-
-    const form = screen.getByTestId("form");
-    await act(async () => {
-      // fill the inputs
-      fireEvent.input(nameInput, { target: { value: "Fries Potatoes" } });
-      fireEvent.input(stockInput, { target: { value: "21" } });
-      fireEvent.input(priceInput, { target: { value: "2400" } });
-      fireEvent.input(descriptionInput, {
-        target: { value: "fires potatoes with lemon flavor 1000gr" },
-      });
-
-      // submit the form
-      fireEvent.submit(form);
-    });
+    await act(async () => await submitValidProduct(screen));
     const successDialog = screen.queryByTestId("simple-dialog");
     await waitFor(() => expect(successDialog).toBeInTheDocument());
 
@@ -295,13 +278,39 @@ describe("Create new product component", () => {
     mockSaveProductUseCase.mockResolvedValue(message);
     render(<CreateNewProductForm />);
 
-    // give a valid product
-    const nameInput = screen.getByTestId("input-name");
-    const priceInput = screen.getByTestId("input-price");
-    const stockInput = screen.getByTestId("input-stock");
-    const descriptionInput = screen.getByTestId("input-description");
+    await (async () => await submitValidProduct(screen));
 
-    const form = screen.getByTestId("form");
+    const closeButton = screen.getByTestId("close-button");
+    const dialog = screen.getByTestId("simple-dialog");
+    await act(async () => {
+      fireEvent.click(closeButton);
+    });
+
+    expect(dialog).toBeInTheDocument();
+    expect(dialog).not.toHaveAttribute("open");
+  });
+
+  it("should show error when server response with a error", async () => {
+    const message = "product already exists";
+    mockSaveProductUseCase.mockRejectedValue(new ServerErrorException(message));
+    render(<CreateNewProductForm />);
+
+    await act(async () => await submitValidProduct(screen))
+
+    const errorForm = screen.getByTestId('form-error')
+    expect(errorForm).toBeInTheDocument()
+    expect(screen.getByText(message)).toBeInTheDocument()
+
+  });
+
+  const submitValidProduct = async (sc: typeof screen) => {
+    // give a valid product
+    const nameInput = sc.getByTestId("input-name");
+    const priceInput = sc.getByTestId("input-price");
+    const stockInput = sc.getByTestId("input-stock");
+    const descriptionInput = sc.getByTestId("input-description");
+
+    const form = sc.getByTestId("form");
     await act(async () => {
       // fill the inputs
       fireEvent.input(nameInput, { target: { value: "Fries Potatoes" } });
@@ -314,14 +323,6 @@ describe("Create new product component", () => {
       // submit the form
       fireEvent.submit(form);
     });
+  };
 
-    const closeButton = screen.getByTestId('close-button')
-    const dialog = screen.getByTestId('simple-dialog')
-    await act(async () => {
-      fireEvent.click(closeButton)
-    })
-
-    expect(dialog).toBeInTheDocument()
-    expect(dialog).not.toHaveAttribute('open')
-  });
 });

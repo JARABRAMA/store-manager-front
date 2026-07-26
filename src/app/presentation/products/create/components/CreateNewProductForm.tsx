@@ -73,7 +73,11 @@ export function CreateNewProductForm({
           onSelectCategory={categoriesPickerState.onSelectCategory}
           selectedCategories={categoriesPickerState.selectedCategories}
         />
-
+        {errors.root && (
+          <span data-testid="form-error" className="text-red-400 col-span-2">
+            {errors.root.message}
+          </span>
+        )}
         <button
           disabled={isSubmitting}
           className="col-span-2 justify-self-end disabled:opacity-30 px-3 py-1 rounded-md self-end bg-blue-600 w-fit"
