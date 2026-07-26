@@ -5,7 +5,13 @@ import { CategoriesHeap } from "../../shared/components/CategoriesHeap";
 import { PricePill } from "./PricePIll";
 import { StockPill } from "./StockPill";
 
-export function ProductDetails({ product }: { product: Product }) {
+export function ProductDetails({
+  product,
+  navigateUpdateProduct
+}: {
+  product: Product;
+  navigateUpdateProduct?: (productId: string) => void;
+}) {
   return (
     <article className="flex flex-col flex-1 gap-5">
       <ImageWithPlaceholder
@@ -24,7 +30,7 @@ export function ProductDetails({ product }: { product: Product }) {
       </div>
 
       <CategoriesSection categories={product.categories} />
-      <ProductActions productId={product.id!} /> 
+      <ProductActions navigateUpdateProduct={navigateUpdateProduct} productId={product.id!} />
     </article>
   );
 }
