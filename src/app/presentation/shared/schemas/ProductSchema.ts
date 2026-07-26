@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export const newProductSchema = z.object({
+export const productSchema = z.object({
   name: z
     .string()
     .nonempty("El nombre del producto no puede estar vacio")
@@ -58,4 +58,4 @@ export const newProductSchema = z.object({
     .optional(),
 });
 
-export type NewProductFormData = z.infer<typeof newProductSchema>;
+export type ProductFormValues = z.infer<typeof productSchema>;

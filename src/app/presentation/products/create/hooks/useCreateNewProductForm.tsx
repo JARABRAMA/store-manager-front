@@ -4,9 +4,9 @@ import { useForm, type SubmitHandler } from "react-hook-form";
 import { useCases } from "../../../../di";
 import type { Product } from "../../../../domain/model/Product";
 import {
-  newProductSchema,
-  type NewProductFormData,
-} from "../schemas/NewProductSchema";
+  productSchema,
+  type ProductFormValues,
+} from "../../../shared/schemas/ProductSchema";
 import { useCategoriesPicker } from "./useCategoriesPicker";
 
 export function useCreateNewProductForm({
@@ -21,11 +21,11 @@ export function useCreateNewProductForm({
     handleSubmit,
     setError,
     formState: { errors, isSubmitting },
-  } = useForm<NewProductFormData>({
-    resolver: zodResolver(newProductSchema),
+  } = useForm<ProductFormValues>({
+    resolver: zodResolver(productSchema),
   });
 
-  const onSubmit: SubmitHandler<NewProductFormData> = async (data) => {
+  const onSubmit: SubmitHandler<ProductFormValues> = async (data) => {
     const product: Product = {
       ...data,
       id: null,
