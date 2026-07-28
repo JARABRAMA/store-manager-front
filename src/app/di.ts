@@ -3,6 +3,7 @@ import { FilterProductsUseCase } from "./application/products/FilterProductsUseC
 import { FindAllCategoriesUseCase } from "./application/products/FindAllCategoriesUseCase";
 import { FindByIdUseCase } from "./application/products/FindByIdUseCase";
 import { SaveProductUseCase } from "./application/products/SaveProductUseCase";
+import { UpdateProductUseCase } from "./application/products/UpdateProductUseCase";
 import type { ProductRepositoryPort } from "./domain/ProductRepositoryPort";
 import { RemoteProductRepository } from "./infraestructure/RemoteProductRepository";
 
@@ -19,4 +20,5 @@ export const useCases = {
   findByIdUseCase: FindByIdUseCase(productRepository),
   deleteProductUseCase: DeleteProductUseCase({ repository: productRepository }),
   saveProductUseCase: SaveProductUseCase({ repository: productRepository }),
+  updateProductUseCase: UpdateProductUseCase({ repository: productRepository }),
 };
