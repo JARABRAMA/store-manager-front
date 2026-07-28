@@ -513,7 +513,7 @@ describe("RemoteProductRepository", () => {
       fetchMock.mockRejectedValue(new Error("connection error"));
 
       try {
-        repository.update(validProduct.id!, validProduct);
+        await repository.update(validProduct.id!, validProduct);
         expect.fail();
       } catch (e) {
         expect(e).toBeInstanceOf(ConnectionFailedException);
