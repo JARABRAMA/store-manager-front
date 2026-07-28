@@ -456,7 +456,7 @@ describe("RemoteProductRepository", () => {
       });
       fetchMock.mockResolvedValue(response);
 
-      const actual = repository.update(validProduct.id!, validProduct);
+      const actual = await repository.update(validProduct.id!, validProduct);
 
       expect(actual).toBe(simpleResponse.message);
     });
@@ -477,7 +477,7 @@ describe("RemoteProductRepository", () => {
       fetchMock.mockResolvedValue(response);
 
       try {
-        repository.update(validProduct.id!, validProduct);
+        await repository.update(validProduct.id!, validProduct);
         expect.fail();
       } catch (e) {
         expect(e).toBeInstanceOf(BadRequestException);
@@ -501,7 +501,7 @@ describe("RemoteProductRepository", () => {
       fetchMock.mockResolvedValue(response);
 
       try {
-        repository.update(validProduct.id!, validProduct);
+        await repository.update(validProduct.id!, validProduct);
       } catch (e) {
         expect(e).toBeInstanceOf(ServerErrorException);
         const error = e as ServerErrorException;
