@@ -432,4 +432,92 @@ describe("RemoteProductRepository", () => {
       }
     });
   });
+
+  describe("update", () => {
+    const validProduct: Product = {
+      id: "846cba72-c113-4285-ae19-5b1b3a0f20b7",
+      name: "Main product",
+      description: "a short description of the main product",
+      price: 12400,
+      stock: 12,
+      imageUrl: "http://url.com.png",
+      categories: null,
+    };
+
+    it("should return message when success", async () => {
+      const simpleResponse = {
+        message: "product saved successfully",
+      };
+      const response = new Response(JSON.stringify(simpleResponse), {
+        status: 200,
+        headers: {
+          "Content-Type": "application-json",
+        },
+      });
+      fetchMock.mockResolvedValue(response);
+
+      const actual = repository.update(validProduct.id!, validProduct);
+
+      expect(actual).toBe(simpleResponse.message);
+    });
+
+    it("should return bad request exception when http code between 400 and 499", async () => {
+      const errResponse: ErrorResponse = {
+        message: "bad request",
+        status: randIntExclusive(400, 500),
+      };
+
+      const response = new Response(JSON.stringify(errResponse), {
+        status: errResponse.status,
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      fetchMock.mockResolvedValue(response);
+
+      try {
+        repository.update(validProduct.id!, validProduct);
+        expect.fail();
+      } catch (e) {
+        expect(e).toBeInstanceOf(BadRequestException);
+        const error = e as BadRequestException;
+        expect(error.message).toBe(errResponse.message);
+      }
+    });
+
+    it("should throw server error exception when http code between 500 and 599", async () => {
+      const errResponse: ErrorResponse = {
+        message: "server error",
+        status: randIntExclusive(500, 600),
+      };
+
+      const response = new Response(JSON.stringify(errResponse), {
+        status: errResponse.status,
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      fetchMock.mockResolvedValue(response);
+
+      try {
+        repository.update(validProduct.id!, validProduct);
+      } catch (e) {
+        expect(e).toBeInstanceOf(ServerErrorException);
+        const error = e as ServerErrorException;
+        expect(error.message).toBe(errResponse.message);
+      }
+    });
+
+    it("should trow connection exception when fetch fails", async () => {
+      fetchMock.mockRejectedValue(new Error("connection error"));
+
+      try {
+        repository.update(validProduct.id!, validProduct);
+        expect.fail();
+      } catch (e) {
+        expect(e).toBeInstanceOf(ConnectionFailedException);
+      }
+    });
+  });
 });
