@@ -129,8 +129,33 @@ export class RemoteProductRepository implements ProductRepositoryPort {
     }
   }
 
-  async update(id: string, product: Product): Promise<void> {
-    throw new Error("Method not implemented.");
+  async update(id: string, product: Product): Promise<string> {
+    let response: Response;
+
+    try {
+      response = await this.fetchFn(`${this.serviceUrl}/api/products/${id}`, {
+        body: JSON.stringify(product),
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+    } catch (e) {
+      const error = e as Error;
+      console.error("update - remote repository: ", error.message);
+      throw new ConnectionFailedException();
+    }
+
+    if (response.ok) {
+      const { message } = (await response.json()) as { message: string };
+      return message;
+    }
+    const { message } = (await response.json()) as ErrorResponse;
+    if (response.status >= 400 && response.status < 500) {
+      throw new BadRequestException(message);
+    } else {
+      throw new ServerErrorException(message);
+    }
   }
 
   async delete(id: string): Promise<string> {
