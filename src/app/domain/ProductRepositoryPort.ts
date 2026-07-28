@@ -11,6 +11,6 @@ export interface ProductRepositoryPort {
   findAllCategories(): Promise<string[]>;
 
   save(product: Product): Promise<string>;
-  update(id: string, product: Product): Promise<void>;
+  update(id: string, product: Product): Promise<string>;
   delete(id: string): Promise<string>
 }
