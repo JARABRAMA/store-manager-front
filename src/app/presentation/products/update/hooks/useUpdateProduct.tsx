@@ -9,12 +9,14 @@ import { useCategoriesPicker } from "../../create/hooks/useCategoriesPicker";
 import { useEffect, useState } from "react";
 import { useProductDetail } from "../../../shared/hooks/useProductDetail";
 import type { FindByIdCommand } from "../../../../application/products/FindByIdUseCase";
+import { useParams } from "react-router";
+import type { useCases } from "../../../../di";
 
 export function useUpdateProduct({
   updateProduct,
   findProductById,
 }: {
-  updateProduct: (product: Product) => Promise<string>;
+  updateProduct: typeof useCases.updateProductUseCase;
   findProductById: ({ id }: FindByIdCommand) => Promise<Product>;
 }) {
   const { product, loading, error } = useProductDetail({
@@ -22,6 +24,7 @@ export function useUpdateProduct({
   });
   const categoriesPickerState = useCategoriesPicker();
   const [successMessage, setSuccessMessage] = useState<string>();
+  const { productId } = useParams();
 
   const {
     register,
@@ -42,13 +45,16 @@ export function useUpdateProduct({
   }, [product, reset]); // should not put categories picker state as dependency: it causes an infinite loop
 
   const onSubmit: SubmitHandler<ProductFormValues> = async (data) => {
-    const product: Product = {
+    const updatedProduct: Product = {
       ...data,
-      id: null,
+      id: productId!,
       categories: categoriesPickerState.selectedCategories,
-    } as unknown as Product;
+    };
+
+    console.log("updating product: ", updatedProduct);
+
     try {
-      const message = await updateProduct(product);
+      const message = await updateProduct(updatedProduct.id!, updatedProduct);
       setSuccessMessage(message);
     } catch (e) {
       const error = e as Error;

@@ -1,15 +1,16 @@
 import { useCases } from "../../../di";
-import type { Product } from "../../../domain/model/Product";
 import { ErrorMessage } from "../../shared/components/ErrorMessage";
 import { LoadingSpinner } from "../../shared/components/LoadingSpinner";
 import { ProductForm } from "../../shared/components/ProductForm";
 import { useUpdateProduct } from "./hooks/useUpdateProduct";
 
-export function UpdateProductForm({ navigateBack }: { navigateBack?: () => void }) {
+export function UpdateProductForm({
+  navigateBack,
+}: {
+  navigateBack?: () => void;
+}) {
   const findById = useCases.findByIdUseCase;
-  const updateProduct = useCases.updateProductUseCase as unknown as (
-    product: Product,
-  ) => Promise<string>;
+  const updateProduct = useCases.updateProductUseCase;
 
   const {
     onSubmit,
@@ -37,7 +38,6 @@ export function UpdateProductForm({ navigateBack }: { navigateBack?: () => void 
       {error && <ErrorMessage message={error} />}
       {product && (
         <div className="flex flex-1 px-4">
-
           <ProductForm
             categoriesPickerState={categoriesPickerState}
             errors={errors}
