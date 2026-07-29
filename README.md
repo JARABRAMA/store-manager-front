@@ -1,75 +1,100 @@
-# React + TypeScript + Vite
+# Store Manager
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A web-based store inventory management application built with React, TypeScript, and Clean Architecture.
 
-Currently, two official plugins are available:
+## Tech Stack
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+| Technology | Description |
+|---|---|
+| **React 19** | UI library |
+| **TypeScript 6** | Language |
+| **Vite 8** | Build tool & dev server |
+| **Tailwind CSS 4** | Utility-first styling |
+| **react-router 8** | Client-side routing |
+| **react-hook-form + Zod** | Form handling & validation |
+| **Vitest + Testing Library** | Unit & component testing |
 
-## React Compiler
+## Features
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- **Product listing** with search (debounced), category filter, and pagination
+- **Product detail** view with full info and action buttons
+- **Create product** with form validation (name, description, price, stock, image, categories)
+- **Update product** with pre-populated form
+- **Delete product** with confirmation dialog
+- **Navigation bar** with placeholders for future Sales and Purchases modules
 
-## Expanding the ESLint configuration
+## Architecture
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+The project follows **Clean Architecture** with four layers:
 
 ```
-
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
-
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-
+src/
+  app/
+    domain/           Enterprise business rules
+      model/          Core entities (Product, Page)
+      exceptions/     Domain-specific exceptions
+      ProductRepositoryPort.ts   Repository interface (port)
+      schmeas/        Zod validation schemas
+    application/      Use cases (business logic)
+      products/       Product use cases
+    infraestructure/  Adapters for external systems
+      RemoteProductRepository.ts   API implementation
+      dto/            Data transfer objects
+      mapper/         DTO-to-domain mappers
+    presentation/     React UI layer
+      App.tsx         Routes
+      main.tsx        Entry point
+      products/       Product feature modules
+      shared/         Reusable components & hooks
 ```
+
+The backend REST API is expected at `http://localhost:8080` (configurable via `VITE_SERVICE_URL`).
+
+### API Endpoints
+
+| Method | Endpoint | Description |
+|---|---|---|
+| `GET` | `/api/products?text=&category=&page=` | List products |
+| `GET` | `/api/products/{id}` | Get product by ID |
+| `GET` | `/api/products/categories` | List all categories |
+| `POST` | `/api/products` | Create product |
+| `PUT` | `/api/products/{id}` | Update product |
+| `DELETE` | `/api/products/{id}` | Delete product |
+
+## Getting Started
+
+```bash
+# Install dependencies
+npm install
+
+# Start development server
+npm run dev
+
+# Type-check & build for production
+npm run build
+
+# Preview production build
+npm run preview
+```
+
+## Testing
+
+```bash
+# Run tests in watch mode
+npm test
+
+# Run tests once with coverage
+npm run test:coverage
+```
+
+## Linting
+
+```bash
+npm run lint
+```
+
+## Environment Variables
+
+| Variable | Default | Description |
+|---|---|---|
+| `VITE_SERVICE_URL` | `http://localhost:8080` | Backend API base URL |
